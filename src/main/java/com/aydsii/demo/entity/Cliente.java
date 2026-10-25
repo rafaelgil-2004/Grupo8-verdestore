@@ -5,13 +5,13 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Cliente")
+@Table(name = "cliente")
 @Schema(description = "Cliente que realiza pedidos")
 public class Cliente {
 
@@ -32,4 +32,12 @@ public class Cliente {
 
     @Schema(description = "Email del cliente", example = "lucia.fernandez@example.com")
     private String email;
+
+    @OneToOne(mappedBy = "cliente")
+    @Schema(description = "Carrito de compras del cliente")
+    private Carrito carrito;
+
+    @OneToMany(mappedBy = "cliente")
+    @Schema(description = "Pedidos realizados por el cliente")
+    private List<Pedido> pedidos;
 }

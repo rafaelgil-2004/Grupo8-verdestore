@@ -5,12 +5,13 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Producto")
+@Table(name = "producto")
 @Schema(description = "Producto del catálogo de VerdeGreen")
 public class Producto {
 
@@ -20,7 +21,8 @@ public class Producto {
             accessMode = Schema.AccessMode.READ_ONLY)
     private Integer id;
 
-    @Schema(description = "Nombre del producto", example = "Vaso plástico reutilizable 400 ml")
+    @Schema(description = "Nombre del producto",
+            example = "Vaso plástico reutilizable 400 ml")
     private String nombre;
 
     @Schema(description = "Descripción del producto",
@@ -30,7 +32,8 @@ public class Producto {
     @Schema(description = "Precio vigente del producto", example = "4500.0")
     private Double precio;
 
-    @Schema(description = "Indica si el producto está activo en el catálogo", example = "true")
+    @Schema(description = "Indica si el producto está activo en el catálogo",
+            example = "true")
     private Boolean activo;
 
     @Schema(description = "Unidades disponibles en stock", example = "120")
@@ -54,4 +57,12 @@ public class Producto {
 
     @Schema(description = "Largo en centímetros", example = "8.0")
     private Double largo;
+
+    @OneToMany(mappedBy = "producto")
+    @Schema(description = "Detalles de pedidos en los que aparece el producto")
+    private List<DetallePedido> detallesPedido;
+
+    @OneToMany(mappedBy = "producto")
+    @Schema(description = "Ítems de carritos que contienen el producto")
+    private List<ItemCarrito> itemsCarrito;
 }

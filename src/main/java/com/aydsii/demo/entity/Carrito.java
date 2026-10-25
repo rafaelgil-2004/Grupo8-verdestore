@@ -1,16 +1,17 @@
-package com.aydsii.demo.entity; 
+package com.aydsii.demo.entity;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "Carrito")
+@Table(name = "carrito")
 @Schema(description = "Carrito de compras de un cliente")
 public class Carrito {
 
@@ -20,7 +21,12 @@ public class Carrito {
             accessMode = Schema.AccessMode.READ_ONLY)
     private Integer id;
 
-    @Column(name = "Cliente_id", nullable = false, unique = true)
-    @Schema(description = "Id del cliente dueño del carrito", example = "1")
-    private Integer clienteId;
+    @OneToOne
+    @JoinColumn(name = "Cliente_id", nullable = false, unique = true)
+    @Schema(description = "Cliente dueño del carrito")
+    private Cliente cliente;
+
+    @OneToMany(mappedBy = "carrito")
+    @Schema(description = "Ítems que contiene el carrito")
+    private List<ItemCarrito> items;
 }
