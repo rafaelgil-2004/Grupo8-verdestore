@@ -1,7 +1,6 @@
 package com.aydsii.demo.service;
 
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import com.aydsii.demo.entity.DetallePedido;
 import com.aydsii.demo.entity.Pedido;
