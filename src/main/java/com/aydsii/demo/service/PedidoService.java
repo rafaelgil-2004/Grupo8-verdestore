@@ -1,119 +1,95 @@
 package com.aydsii.demo.service;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.aydsii.demo.entity.DetallePedido;
 import com.aydsii.demo.entity.Pedido;
 import com.aydsii.demo.entity.Producto;
 import com.aydsii.demo.model.HistorialRespuestaDTO;
 import com.aydsii.demo.model.ProductoHistorialDTO;
-import com.aydsii.demo.repository.PedidoRepository;
-import com.aydsii.demo.repository.ProductoRepository;
 import com.aydsii.demo.repository.DetallePedidoRepository;
+import com.aydsii.demo.repository.PedidoRepository;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Service 
+@Service
 public class PedidoService {
-    private PedidoRepository pedidoRepository;
-    private DetallePedidoRepository detallePedidoRepository;
-    private ProductoRepository productoRepository;
 
-    public PedidoService(PedidoRepository pedidoRepository, DetallePedidoRepository detallePedidoRepository, ProductoRepository productoRepository) {
+    private final PedidoRepository pedidoRepository;
+    private final DetallePedidoRepository detallePedidoRepository;
+
+    public PedidoService(PedidoRepository pedidoRepository,
+                         DetallePedidoRepository detallePedidoRepository) {
         this.pedidoRepository = pedidoRepository;
         this.detallePedidoRepository = detallePedidoRepository;
-        this.productoRepository = productoRepository;
     }
 
+   
     public List<HistorialRespuestaDTO> consultarHistorial(Integer clienteId) {
 
-    //pedidos del cliente, del más nuevo al más viejo.
-    List<Pedido> pedidos =
+        //pedidos del cliente
+        List<Pedido> pedidos =
             pedidoRepository.findByClienteIdOrderByFechaRealizacionDesc(clienteId);
 
-    if (pedidos.isEmpty()) {
-        return List.of();
-    }
+        if (pedidos.isEmpty()) {
+            return List.of();
+        }
 
-    //id de los pedidos.
-    List<Integer> pedidoIds = new ArrayList<>();
+        //ids de esos pedidos
+        List<Integer> pedidoIds = new ArrayList<>();
 
-    for (Pedido pedido : pedidos) {
-        pedidoIds.add(pedido.getId());
-    }
+        for (Pedido pedido : pedidos) {
+            pedidoIds.add(pedido.getId());
+        }
 
-    //detalles de esos pedidos.
-    List<DetallePedido> detalles =
+        //detalles de esos pedidos
+        List<DetallePedido> detalles =
             detallePedidoRepository.findByPedidoIdIn(pedidoIds);
 
-    //id de los productos
-    List<Integer> productoIds = detalles.stream()
-        .map(detalle -> detalle.getProducto().getId())
-        .distinct()
-        .toList();
+        //agrupar los detalles por pedido
+        Map<Integer, List<DetallePedido>> detallesPorPedido = new HashMap<>();
 
-    List<Producto> productosEncontrados =
-            productoRepository.findAllById(productoIds);
+        for (DetallePedido detalle : detalles) {
+            Integer pedidoId = detalle.getPedido().getId();
 
-    //encontrar cada producto por su ID.
-    Map<Integer, Producto> productosPorId = new HashMap<>();
+            if (!detallesPorPedido.containsKey(pedidoId)) {
+                detallesPorPedido.put(pedidoId, new ArrayList<>());
+            }
 
-    for (Producto producto : productosEncontrados) {
-        productosPorId.put(producto.getId(), producto);
-    }
-
-    //agrupar los detalles por pedido.
-    Map<Integer, List<DetallePedido>> detallesPorPedido = new HashMap<>();
-
-    for (DetallePedido detalle : detalles) {
-        Integer pedidoId = detalle.getPedido().getId();
-
-        if (!detallesPorPedido.containsKey(pedidoId)) {
-            detallesPorPedido.put(pedidoId, new ArrayList<>());
+            detallesPorPedido.get(pedidoId).add(detalle);
         }
 
-        detallesPorPedido.get(pedidoId).add(detalle);
-    }
+        //crear la respuesta
+        List<HistorialRespuestaDTO> historial = new ArrayList<>();
 
-    //crear la respuesta para cada pedido.
-    List<HistorialRespuestaDTO> historial = new ArrayList<>();
-
-    for (Pedido pedido : pedidos) {
-        List<DetallePedido> detallesDelPedido =
+        for (Pedido pedido : pedidos) {
+            List<DetallePedido> detallesDelPedido =
                 detallesPorPedido.getOrDefault(pedido.getId(), List.of());
 
-        historial.add(armarDTO(
-                pedido,
-                detallesDelPedido,
-                productosPorId
-        ));
+            historial.add(armarDTO(pedido, detallesDelPedido));
+        }
+
+        return historial;
     }
 
-    return historial;
-}
+    private HistorialRespuestaDTO armarDTO(Pedido pedido, List<DetallePedido> detalles) {
 
-private HistorialRespuestaDTO armarDTO(
-        Pedido pedido,
-        List<DetallePedido> detalles,
-        Map<Integer, Producto> productosPorId) {
+        List<ProductoHistorialDTO> productos = new ArrayList<>();
 
-    List<ProductoHistorialDTO> productos = new ArrayList<>();
+        for (DetallePedido detalle : detalles) {
+            Producto producto = detalle.getProducto();
 
-    for (DetallePedido detalle : detalles) {
-       Producto producto = detalle.getProducto();
-
-        if (producto != null) {
             productos.add(new ProductoHistorialDTO(
-                    producto.getNombre(),
-                    producto.getDescripcion(),
-                    detalle.getCantidad(),
-                    detalle.getCantidad() * detalle.getPrecioUnitario()
+                producto.getNombre(),
+                producto.getDescripcion(),
+                detalle.getCantidad(),
+                detalle.getCantidad() * detalle.getPrecioUnitario()
             ));
         }
-    }
 
         return new HistorialRespuestaDTO(
             pedido.getTotal(),
@@ -125,5 +101,4 @@ private HistorialRespuestaDTO armarDTO(
             productos
         );
     }
-
 }
