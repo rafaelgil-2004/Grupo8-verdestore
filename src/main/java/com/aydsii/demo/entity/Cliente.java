@@ -4,14 +4,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "cliente")
+@Table(name = "Cliente")
 @Schema(description = "Cliente que realiza pedidos")
 public class Cliente {
 
@@ -37,7 +40,10 @@ public class Cliente {
     @Schema(description = "Carrito de compras del cliente")
     private Carrito carrito;
 
+    
     @OneToMany(mappedBy = "cliente")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @Schema(description = "Pedidos realizados por el cliente")
     private List<Pedido> pedidos;
 }

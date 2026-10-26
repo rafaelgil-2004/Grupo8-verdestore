@@ -4,14 +4,17 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+
 import java.util.List;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "producto")
+@Table(name = "Producto")
 @Schema(description = "Producto del catálogo de VerdeGreen")
 public class Producto {
 
@@ -59,10 +62,14 @@ public class Producto {
     private Double largo;
 
     @OneToMany(mappedBy = "producto")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @Schema(description = "Detalles de pedidos en los que aparece el producto")
     private List<DetallePedido> detallesPedido;
 
     @OneToMany(mappedBy = "producto")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @Schema(description = "Ítems de carritos que contienen el producto")
     private List<ItemCarrito> itemsCarrito;
 }

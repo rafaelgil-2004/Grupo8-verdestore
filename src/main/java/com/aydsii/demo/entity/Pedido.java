@@ -4,7 +4,10 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+
 import java.time.LocalDateTime;
 import java.util.List;
 import com.aydsii.demo.Estados;
@@ -13,7 +16,7 @@ import com.aydsii.demo.Estados;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "pedido")
+@Table(name = "Pedido")
 @Schema(description = "Pedido realizado por un cliente")
 public class Pedido {
 
@@ -56,6 +59,8 @@ public class Pedido {
     private String motivo;
 
     @OneToMany(mappedBy = "pedido")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     @Schema(description = "Detalles de productos incluidos en el pedido")
     private List<DetallePedido> detalles;
 

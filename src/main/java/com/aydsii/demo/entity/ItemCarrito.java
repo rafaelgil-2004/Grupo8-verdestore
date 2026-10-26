@@ -10,24 +10,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "itemcarrito")
+@Table(name = "itemCarrito")
+@IdClass(ItemCarritoId.class)
 @Schema(description = "Producto agregado a un carrito, con su cantidad")
 public class ItemCarrito {
 
-    @EmbeddedId
-    @Schema(description = "Identificadores del carrito y del producto")
-    private ItemCarritoId id;
-
-    @MapsId("carritoId")
-    @ManyToOne
-    @JoinColumn(name = "Carrito_id", nullable = false)
-    @Schema(description = "Carrito al que pertenece el ítem")
+    @Id
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "Carrito_id")
     private Carrito carrito;
 
-    @MapsId("productoId")
-    @ManyToOne
-    @JoinColumn(name = "Producto_id", nullable = false)
-    @Schema(description = "Producto agregado al carrito")
+    @Id
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "Producto_id")
     private Producto producto;
 
     @Schema(description = "Cantidad del producto en el carrito", example = "2")

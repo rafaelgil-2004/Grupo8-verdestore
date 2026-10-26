@@ -10,24 +10,19 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Entity
-@Table(name = "detallepedido")
+@Table(name = "DetallePedido")
+@IdClass(DetallePedidoId.class)
 @Schema(description = "Línea de un pedido: un producto con su cantidad y el precio fijado al comprar")
 public class DetallePedido {
 
-    @EmbeddedId
-    @Schema(description = "Identificadores del pedido y del producto")
-    private DetallePedidoId id;
-
-    @MapsId("pedidoId")
-    @ManyToOne
-    @JoinColumn(name = "Pedido_id", nullable = false)
-    @Schema(description = "Pedido al que pertenece la línea")
+    @Id
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "Pedido_id")
     private Pedido pedido;
 
-    @MapsId("productoId")
-    @ManyToOne
-    @JoinColumn(name = "Producto_id", nullable = false)
-    @Schema(description = "Producto comprado")
+    @Id
+    @ManyToOne(optional = false)
+    @JoinColumn(name = "Producto_id")
     private Producto producto;
 
     @Schema(description = "Cantidad comprada", example = "2")
