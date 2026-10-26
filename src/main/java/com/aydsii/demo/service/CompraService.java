@@ -42,8 +42,7 @@ public class CompraService {
     private final DetallePedidoRepository detallePedidoRepository;
     private final SistemaPagoSim sistemaPagoSim;
 
-    // Una ResponseStatusException (RuntimeException) revierte toda la transacción,
-    // incluidos los descuentos de stock ya ejecutados
+    
     @Transactional
     public Map<String, Object> comprar(Integer clienteId, String numeroTarjeta, String direccion) {
         Cliente cliente = buscarCliente(clienteId);
@@ -104,7 +103,7 @@ public class CompraService {
     }
 
     private DetallePedido detalleProducto(Producto p, Integer cant) {
-        if (!Boolean.TRUE.equals(p.getActivo())) {
+        if (p.getActivo() == false) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "El producto no está disponible: " + p.getNombre());
         }
