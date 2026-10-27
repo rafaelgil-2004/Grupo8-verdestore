@@ -14,8 +14,7 @@ public interface ItemCarritoRepository extends JpaRepository<ItemCarrito, ItemCa
 
     @Query("SELECT i FROM ItemCarrito i WHERE i.carrito.id = :carritoId")
     List<ItemCarrito> buscarPorCarritoId(@Param("carritoId") Integer carritoId);
-
-    // DELETE masivo en una sola sentencia; requiere transacción activa (la abre CompraService)
+    
     @Modifying
     @Query("DELETE FROM ItemCarrito i WHERE i.carrito.id = :carritoId")
     int eliminarPorCarritoId(@Param("carritoId") Integer carritoId);
