@@ -23,7 +23,7 @@ public class PedidoController {
         this.service = service;
     }
 
-    @GetMapping("/historial")
+    @GetMapping()
     @Operation(
         summary = "Consultar historial de pedidos",
         description = "Devuelve los pedidos de un cliente con sus datos y productos"
